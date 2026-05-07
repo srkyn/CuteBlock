@@ -3,14 +3,17 @@ const DEFAULT_SETTINGS = {
   enabled: true,
   theme: "mixed",
   density: "balanced",
+  imageSource: "local",
   imageFit: "smart",
   disabledSites: []
 };
+const RANDOM_DOG_ORIGINS = ["https://random.dog/*", "https://dog.ceo/*"];
 
 const enabled = document.querySelector("#enabled");
 const siteEnabled = document.querySelector("#site-enabled");
 const siteLabel = document.querySelector("#site-label");
 const theme = document.querySelector("#theme");
+const imageSource = document.querySelector("#image-source");
 const imageFit = document.querySelector("#image-fit");
 const status = document.querySelector("#status");
 const densityInputs = [...document.querySelectorAll("input[name='density']")];
@@ -49,6 +52,7 @@ function setStatus(message) {
 function render() {
   enabled.checked = settings.enabled;
   theme.value = settings.theme;
+  imageSource.value = settings.imageSource;
   imageFit.value = settings.imageFit;
   siteEnabled.checked = !isCurrentSiteDisabled();
   siteEnabled.disabled = !currentHost;
@@ -63,6 +67,7 @@ function collectSettings() {
     ...settings,
     enabled: enabled.checked,
     theme: theme.value,
+    imageSource: imageSource.value,
     imageFit: imageFit.value,
     density: getSelectedDensity()
   };
@@ -82,6 +87,37 @@ function setSiteEnabled(isEnabled) {
   const disabledSites = settings.disabledSites.filter((site) => !hostMatches(currentHost, site));
   if (!isEnabled) disabledSites.push(currentHost);
   save({ ...collectSettings(), disabledSites });
+}
+
+function setImageSource(nextSource) {
+  if (nextSource !== "online-dogs") {
+    chrome.permissions?.remove?.({ origins: RANDOM_DOG_ORIGINS });
+    save({ ...collectSettings(), imageSource: "local" });
+    return;
+  }
+
+  const warning = [
+    "Random dog photos are optional.",
+    "",
+    "If enabled, CuteBlock may request images from random.dog or dog.ceo when it replaces an ad. Those services may receive normal web request metadata such as your IP address and browser user agent.",
+    "",
+    "Bundled photos remain available without external requests. Enable Random dog API?"
+  ].join("\n");
+
+  if (!window.confirm(warning)) {
+    imageSource.value = settings.imageSource;
+    return;
+  }
+
+  chrome.permissions.request({ origins: RANDOM_DOG_ORIGINS }, (granted) => {
+    if (!granted) {
+      imageSource.value = settings.imageSource;
+      setStatus("Random dog access denied");
+      return;
+    }
+
+    save({ ...collectSettings(), imageSource: "online-dogs" });
+  });
 }
 
 function loadSettings() {
@@ -105,6 +141,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
 
 enabled.addEventListener("change", () => save());
 theme.addEventListener("change", () => save());
+imageSource.addEventListener("change", () => setImageSource(imageSource.value));
 imageFit.addEventListener("change", () => save());
 siteEnabled.addEventListener("change", () => setSiteEnabled(siteEnabled.checked));
 densityInputs.forEach((input) => input.addEventListener("change", () => save()));
