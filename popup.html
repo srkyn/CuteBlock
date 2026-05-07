@@ -21,6 +21,11 @@
         <input id="enabled" type="checkbox" role="switch">
       </label>
 
+      <label class="toggle-row">
+        <span id="site-label">Current site</span>
+        <input id="site-enabled" type="checkbox" role="switch">
+      </label>
+
       <section class="control">
         <span class="label">Animal theme</span>
         <select id="theme">
@@ -40,6 +45,16 @@
           <label><input type="radio" name="density" value="eager"> Eager</label>
         </div>
       </section>
+
+      <details class="credits">
+        <summary>Photo credits</summary>
+        <ul>
+          <li>Cat: Wikimedia Commons, CC0 1.0</li>
+          <li>Dog: Wikimedia Commons, CC0 1.0</li>
+          <li>Capybara: Wikimedia Commons, public domain</li>
+          <li>Bird: Jim, Wikimedia Commons, CC BY 2.0</li>
+        </ul>
+      </details>
 
       <p id="status" class="status" aria-live="polite"></p>
     </main>

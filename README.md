@@ -1,6 +1,6 @@
 # CuteBlock
 
-CuteBlock is a playful browser extension that replaces obvious ad containers with cute animal panels instead of collapsing the page layout.
+CuteBlock is a playful browser extension that replaces obvious ad containers with cute animal photos instead of collapsing the page layout.
 
 ## Load It In Chrome Or Edge
 
@@ -11,20 +11,33 @@ CuteBlock is a playful browser extension that replaces obvious ad containers wit
 
 ## Try It
 
-Open `test/ad-test.html` in the browser after loading the extension. The fake ad slots should become animal cards.
+Open `test/ad-test.html` in the browser after loading the extension. The fake ad slots should become animal cards. If you are using the local server from this workspace, visit `http://127.0.0.1:8765/test/ad-test.html`.
 
-## Current MVP
+## Current Features
 
 - Manifest V3 extension.
 - DOM-level replacement for common ad selectors, sponsored blocks, and ad-like class/id names.
+- Starter EasyList-style cosmetic filter support from `filters/cosmetic-lite.txt`.
+- Reversible replacements when CuteBlock is disabled or paused for the current site.
 - MutationObserver support for ads inserted after page load.
-- Popup settings for enable/disable, animal theme, and replacement level.
+- Popup settings for enable/disable, current-site control, animal theme, and replacement level.
 - No external image requests.
+
+## Cosmetic Filter Syntax
+
+CuteBlock currently supports a small, deliberate subset of Adblock Plus/EasyList cosmetic syntax:
+
+- `##selector`
+- `domain.com##selector`
+- `domain.com,~excluded.com##selector`
+- `#@#` exception rules
+
+Unsupported rules are ignored for now, including procedural selectors such as `:has()` and `:-abp-has()`.
 
 ## Next Good Steps
 
-- Add an allowlist for sites where the user wants ads unchanged.
-- Add stronger blocklist support from a maintained filter list.
+- Add user-configurable external filter subscriptions.
+- Add stronger network-rule support for identifying ad iframes and images.
 - Add more bundled animal art packs.
 - Add per-site replacement stats.
 

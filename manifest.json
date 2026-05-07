@@ -2,12 +2,13 @@
   "manifest_version": 3,
   "name": "CuteBlock",
   "description": "Replace annoying ads with cute animals.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "action": {
     "default_title": "CuteBlock",
     "default_popup": "popup.html"
   },
   "permissions": [
+    "activeTab",
     "storage"
   ],
   "host_permissions": [
@@ -31,7 +32,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "assets/*.jpg"
+        "assets/*.jpg",
+        "filters/*.txt"
       ],
       "matches": [
         "<all_urls>"

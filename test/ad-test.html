@@ -59,6 +59,13 @@
         margin-top: 16px;
       }
 
+      .article-promo {
+        background: #eef7ff;
+        border-left: 4px solid #4b8ec8;
+        margin-top: 16px;
+        padding: 12px;
+      }
+
       @media (max-width: 760px) {
         .layout {
           grid-template-columns: 1fr;
@@ -74,6 +81,9 @@
           <h1>CuteBlock test page</h1>
           <p>This page includes fake ad containers with common ad-like names so you can verify replacement behavior locally.</p>
           <div id="google_ads_iframe_test">Inline ad unit</div>
+          <div class="article-promo" data-testid="reader-promo">
+            Legitimate article promotion that should stay intact.
+          </div>
           <p>Real sites vary a lot, but this gives us a stable little sandbox while the extension grows up.</p>
         </article>
         <aside>
