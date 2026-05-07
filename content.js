@@ -11577,6 +11577,12 @@
           if (cached) return Promise.resolve(cached);
           return fetchRemoteDogImage().then((url) => isSupportedRemoteImage(url) ? url : getAssetUrl(animal.file)).catch(() => getAssetUrl(animal.file));
         }
+        function applyAnimalImage(card, img, url, source) {
+          img.src = url;
+          img.dataset.cuteblockImageSource = source;
+          card.dataset.cuteblockImageSource = source;
+          card.style.setProperty("background-image", `url("${url.replaceAll('"', "%22")}")`, "important");
+        }
         function getTokens(element) {
           const parts = [
             element.id,
@@ -11797,13 +11803,21 @@
           const img = document.createElement("img");
           img.className = "cuteblock-art";
           img.alt = "";
-          img.loading = "lazy";
           img.decoding = "async";
-          resolveAnimalImage(animal).then((url) => {
-            img.src = url;
-            card.style.setProperty("background-image", `url("${url.replaceAll('"', "%22")}")`, "important");
+          img.addEventListener("load", () => {
             card.classList.add("cuteblock-has-art");
+            card.classList.remove("cuteblock-art-error");
           });
+          img.addEventListener("error", () => {
+            card.classList.add("cuteblock-art-error");
+          });
+          const fallbackUrl = getAssetUrl(animal.file);
+          applyAnimalImage(card, img, fallbackUrl, "bundled");
+          if (settings.imageSource === "online-dogs") {
+            resolveAnimalImage(animal).then((url) => {
+              applyAnimalImage(card, img, url, "online-dogs");
+            });
+          }
           const copy = document.createElement("span");
           copy.className = "cuteblock-copy";
           const title = document.createElement("span");
