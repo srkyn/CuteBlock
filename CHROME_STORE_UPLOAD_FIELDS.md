@@ -114,6 +114,12 @@ Support URL:
 https://github.com/srkyn/CuteBlock/issues
 ```
 
+Privacy practices fields:
+
+```text
+See CHROME_PRIVACY_PRACTICES_FIELDS.md
+```
+
 ## Package
 
 Upload this ZIP:
