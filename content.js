@@ -11462,6 +11462,7 @@
           theme: "mixed",
           density: "balanced",
           imageSource: "local",
+          imageFit: "smart",
           disabledSites: []
         };
         const ANIMALS = [
@@ -11582,6 +11583,11 @@
           img.dataset.cuteblockImageSource = source;
           card.dataset.cuteblockImageSource = source;
           card.style.setProperty("background-image", `url("${url.replaceAll('"', "%22")}")`, "important");
+        }
+        function getImageFitMode(width, height) {
+          if (settings.imageFit === "cover" || settings.imageFit === "contain") return settings.imageFit;
+          const aspectRatio = width / Math.max(height, 1);
+          return aspectRatio > 3.2 || height < 130 ? "contain" : "cover";
         }
         function getTokens(element) {
           const parts = [
@@ -11793,8 +11799,9 @@
         function createCard(width, height) {
           const animal = pickAnimal();
           const compact = width < 180 || height < 95;
+          const fitMode = getImageFitMode(width, height);
           const card = document.createElement("div");
-          card.className = `cuteblock-card${compact ? " cuteblock-compact" : ""}`;
+          card.className = `cuteblock-card cuteblock-fit-${fitMode}${compact ? " cuteblock-compact" : ""}`;
           card.setAttribute("role", "img");
           card.setAttribute("aria-label", `${animal.title}. ${animal.subtitle}`);
           card.style.setProperty("width", "100%", "important");
