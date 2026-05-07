@@ -57,6 +57,11 @@ Run the local checks:
 npm run check
 ```
 
+## Privacy And Notices
+
+- Privacy notes live in [`PRIVACY.md`](PRIVACY.md).
+- Third-party code and photo notices live in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
 ## Next Good Steps
 
 - Add user-configurable external filter subscriptions powered by Ghostery's engine.

@@ -5,8 +5,6 @@
 !   domain.com,~excluded.com##selector
 !   #@# exception rules
 
-##.ad
-##.ads
 ##.ad-container
 ##.ad-wrapper
 ##.ad-unit

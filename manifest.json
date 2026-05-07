@@ -12,7 +12,6 @@
     "storage"
   ],
   "host_permissions": [
-    "<all_urls>",
     "https://random.dog/*",
     "https://dog.ceo/*"
   ],

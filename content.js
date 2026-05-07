@@ -11513,10 +11513,16 @@
           [300, 600],
           [160, 600]
         ];
+        const PAGE_CONTENT_TAGS = /* @__PURE__ */ new Set(["ARTICLE", "MAIN", "NAV", "HEADER", "FOOTER", "FORM"]);
+        const MAX_ENGINE_SELECTORS = 80;
+        const MAX_HINT_ELEMENTS = 1200;
+        const MAX_SELECTOR_MATCHES = 200;
+        const MAX_HEURISTIC_CANDIDATES = 600;
         let settings = { ...DEFAULT_SETTINGS };
         let filterEngine = null;
         let cosmeticExceptionRules = [];
         let scanTimer = null;
+        const pendingScanRoots = /* @__PURE__ */ new Set();
         const replaced = /* @__PURE__ */ new WeakMap();
         const remoteImageCache = [];
         const getAssetUrl = (file) => chrome.runtime.getURL(`assets/${file}`);
@@ -11617,9 +11623,15 @@
             return false;
           }
         }
-        function safeQueryAll(root, selector) {
+        function safeQueryLimited(root, selector, limit) {
           try {
-            return [...root.querySelectorAll(selector)];
+            const matches2 = root.querySelectorAll(selector);
+            const elements = [];
+            for (const element of matches2) {
+              elements.push(element);
+              if (elements.length >= limit) break;
+            }
+            return elements;
           } catch {
             return [];
           }
@@ -11720,7 +11732,7 @@
             if (element instanceof HTMLAnchorElement && element.href) hrefs.add(element.href);
           };
           if (root instanceof HTMLElement && safeMatches(root, selector)) addElement(root);
-          safeQueryAll(root, selector).forEach(addElement);
+          safeQueryLimited(root, selector, MAX_HINT_ELEMENTS).forEach(addElement);
           return {
             classes: [...classes],
             ids: [...ids],
@@ -11747,7 +11759,7 @@
             hidingStyle: "display:none!important",
             callerContext: null
           });
-          return selectorsFromStyles(result.styles);
+          return selectorsFromStyles(result.styles).slice(0, MAX_ENGINE_SELECTORS);
         }
         function getDensityThreshold() {
           if (settings.density === "gentle") return 5;
@@ -11786,6 +11798,7 @@
           const rect = element.getBoundingClientRect();
           if (rect.width < 24 || rect.height < 24) return false;
           if (rect.width * rect.height < 1200) return false;
+          if (rect.width * rect.height > 9e5) return false;
           const style = window.getComputedStyle(element);
           return style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) !== 0;
         }
@@ -11795,13 +11808,30 @@
           const rect = element.getBoundingClientRect();
           return scoreHeuristic(element, rect) >= getDensityThreshold();
         }
+        function isSafeReplacementTarget(element, childRect) {
+          if (!(element instanceof HTMLElement)) return false;
+          if (PAGE_CONTENT_TAGS.has(element.tagName)) return false;
+          if (element.matches("article, main, nav, header, footer, form, [role='main'], [role='navigation']")) return false;
+          if (element.querySelector("article, main, form, [role='main']")) return false;
+          const rect = element.getBoundingClientRect();
+          if (rect.width < 24 || rect.height < 24) return false;
+          const area = rect.width * rect.height;
+          const childArea = Math.max(childRect.width * childRect.height, 1);
+          if (area > 9e5) return false;
+          return area <= childArea * 2.5;
+        }
         function findReplacementTarget(element) {
           let target = element;
-          for (let current = element.parentElement; current && current !== document.body; current = current.parentElement) {
+          let targetRect = element.getBoundingClientRect();
+          let depth = 0;
+          for (let current = element.parentElement; current && current !== document.body && depth < 2; current = current.parentElement, depth += 1) {
             const rect = current.getBoundingClientRect();
             const score = scoreHeuristic(current, rect);
             if (score < getDensityThreshold()) break;
-            if (rect.width >= 24 && rect.height >= 24 && rect.width * rect.height <= 9e5) target = current;
+            if (isSafeReplacementTarget(current, targetRect)) {
+              target = current;
+              targetRect = rect;
+            }
           }
           return target;
         }
@@ -11874,9 +11904,14 @@
         function restoreElement(element, original) {
           element.replaceChildren(...original.children);
           element.removeAttribute(REPLACED_ATTR);
-          element.style.setProperty("min-width", original.style.minWidth, original.style.minWidthPriority);
-          element.style.setProperty("min-height", original.style.minHeight, original.style.minHeightPriority);
-          element.style.setProperty("overflow", original.style.overflow, original.style.overflowPriority);
+          restoreStyle(element, "min-width", original.style.minWidth, original.style.minWidthPriority);
+          restoreStyle(element, "min-height", original.style.minHeight, original.style.minHeightPriority);
+          restoreStyle(element, "overflow", original.style.overflow, original.style.overflowPriority);
+          replaced.delete(element);
+        }
+        function restoreStyle(element, property, value, priority) {
+          if (value) element.style.setProperty(property, value, priority);
+          else element.style.removeProperty(property);
         }
         function restoreAll() {
           document.querySelectorAll(`[${REPLACED_ATTR}]`).forEach((element) => {
@@ -11889,7 +11924,7 @@
           const candidates = /* @__PURE__ */ new Set();
           getEngineSelectors(root).forEach((selector) => {
             if (root instanceof HTMLElement && safeMatches(root, selector)) candidates.add(root);
-            safeQueryAll(root, selector).forEach((element) => candidates.add(element));
+            safeQueryLimited(root, selector, MAX_SELECTOR_MATCHES).forEach((element) => candidates.add(element));
           });
           return candidates;
         }
@@ -11897,7 +11932,7 @@
           const candidates = /* @__PURE__ */ new Set();
           const selector = "[id], [class], [aria-label], [data-testid], [data-ad], [data-ad-client], [data-ad-slot], iframe, ins";
           if (root instanceof HTMLElement && safeMatches(root, selector)) candidates.add(root);
-          safeQueryAll(root, selector).forEach((element) => candidates.add(element));
+          safeQueryLimited(root, selector, MAX_HEURISTIC_CANDIDATES).forEach((element) => candidates.add(element));
           return candidates;
         }
         function scan(root = document) {
@@ -11909,8 +11944,19 @@
           collectHeuristicCandidates(root).forEach((element) => replaceAd(element, "heuristic"));
         }
         function scheduleScan(root = document) {
+          pendingScanRoots.add(root);
           window.clearTimeout(scanTimer);
-          scanTimer = window.setTimeout(() => scan(root), 150);
+          scanTimer = window.setTimeout(() => {
+            const roots = [...pendingScanRoots].filter(Boolean);
+            pendingScanRoots.clear();
+            if (!roots.length || roots.includes(document) || roots.length > 20) {
+              scan(document);
+              return;
+            }
+            roots.forEach((scanRoot) => {
+              if (scanRoot.isConnected || scanRoot === document) scan(scanRoot);
+            });
+          }, 200);
         }
         function startObserver() {
           const observer = new MutationObserver((mutations) => {
@@ -11941,10 +11987,17 @@
         chrome.storage.onChanged.addListener((changes, areaName) => {
           if (areaName !== "sync" || !changes[SETTINGS_KEY]) return;
           const wasActive = isActive();
+          const previousSettings = settings;
           settings = normalizeSettings(changes[SETTINGS_KEY].newValue);
           if (wasActive && !isActive()) restoreAll();
-          else scheduleScan();
+          else if (isActive() && settingsRequireRefresh(previousSettings, settings)) {
+            restoreAll();
+            scheduleScan();
+          } else scheduleScan();
         });
+        function settingsRequireRefresh(previous, next) {
+          return previous.theme !== next.theme || previous.imageSource !== next.imageSource || previous.imageFit !== next.imageFit || previous.density !== next.density;
+        }
       })();
     }
   });
