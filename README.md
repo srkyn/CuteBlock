@@ -18,6 +18,7 @@ Open `test/ad-test.html` in the browser after loading the extension. The fake ad
 - Manifest V3 extension.
 - DOM-level replacement for common ad selectors, sponsored blocks, and ad-like class/id names.
 - Starter EasyList-style cosmetic filter support from `filters/cosmetic-lite.txt`.
+- Ghostery's MPL-2.0 filtering engine powers cosmetic rule matching.
 - Reversible replacements when CuteBlock is disabled or paused for the current site.
 - MutationObserver support for ads inserted after page load.
 - Popup settings for enable/disable, current-site control, animal theme, and replacement level.
@@ -25,7 +26,7 @@ Open `test/ad-test.html` in the browser after loading the extension. The fake ad
 
 ## Cosmetic Filter Syntax
 
-CuteBlock currently supports a small, deliberate subset of Adblock Plus/EasyList cosmetic syntax:
+CuteBlock uses Ghostery's adblocker engine for cosmetic rule matching, with a small bundled starter list:
 
 - `##selector`
 - `domain.com##selector`
@@ -34,9 +35,29 @@ CuteBlock currently supports a small, deliberate subset of Adblock Plus/EasyList
 
 Unsupported rules are ignored for now, including procedural selectors such as `:has()` and `:-abp-has()`.
 
+## Development
+
+Install dependencies once:
+
+```bash
+npm install
+```
+
+Build the bundled content script:
+
+```bash
+npm run build
+```
+
+Run the local checks:
+
+```bash
+npm run check
+```
+
 ## Next Good Steps
 
-- Add user-configurable external filter subscriptions.
+- Add user-configurable external filter subscriptions powered by Ghostery's engine.
 - Add stronger network-rule support for identifying ad iframes and images.
 - Add more bundled animal art packs.
 - Add per-site replacement stats.
