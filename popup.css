@@ -25,7 +25,7 @@ body {
 .brand-mark {
   border-radius: 8px;
   height: 54px;
-  object-fit: cover;
+  object-fit: contain;
   width: 54px;
 }
 
@@ -116,6 +116,12 @@ select {
   font-size: 12px;
   font-weight: 750;
   min-height: 16px;
+}
+
+.hint {
+  color: #63727b;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .credits {

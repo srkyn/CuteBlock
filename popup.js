@@ -101,7 +101,7 @@ function setImageSource(nextSource) {
     "",
     "If enabled, CuteBlock may request images from random.dog or dog.ceo when it replaces an ad. Those services may receive normal web request metadata such as your IP address and browser user agent.",
     "",
-    "Bundled photos remain available without external requests. Enable Random dog API?"
+    "Bundled photos remain available without external requests. Enable random dog photos?"
   ].join("\n");
 
   if (!window.confirm(warning)) {

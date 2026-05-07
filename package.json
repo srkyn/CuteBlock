@@ -1,7 +1,7 @@
 {
   "name": "cuteblock",
-  "version": "0.2.2",
-  "description": "CuteBlock is a playful browser extension that replaces obvious ad containers with cute animal photos instead of collapsing the page layout.",
+  "version": "0.2.3",
+  "description": "CuteBlock is a playful browser extension that replaces likely ad containers with cute animal photos instead of collapsing the page layout.",
   "private": true,
   "directories": {
     "test": "test"
@@ -17,8 +17,13 @@
     "type": "git",
     "url": "git+https://github.com/srkyn/CuteBlock.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "browser-extension",
+    "ad-replacement",
+    "chrome-extension",
+    "cute-animals",
+    "privacy"
+  ],
   "license": "MPL-2.0",
   "type": "commonjs",
   "bugs": {

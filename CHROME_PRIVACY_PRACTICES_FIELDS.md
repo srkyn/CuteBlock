@@ -37,7 +37,7 @@ CuteBlock does not execute remotely hosted code. All JavaScript, CSS, filter rul
 ## storage Justification
 
 ```text
-CuteBlock uses storage to save user preferences, including whether the extension is enabled, paused sites, animal theme, replacement level, and photo fit mode. These settings are stored by the browser's extension storage system so the user's choices persist between browsing sessions.
+CuteBlock uses storage to save user preferences, including whether the extension is enabled, paused sites, animal theme, replacement level, photo fit mode, and image source. These settings are stored by the browser's extension storage system so the user's choices persist between browsing sessions.
 ```
 
 ## Optional Remote Image Disclosure

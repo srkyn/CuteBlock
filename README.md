@@ -1,6 +1,10 @@
 # CuteBlock
 
-CuteBlock is a playful browser extension that replaces obvious ad containers with cute animal photos instead of collapsing the page layout.
+CuteBlock is a playful browser extension that replaces likely ad containers with cute animal photos instead of collapsing the page layout.
+
+![CuteBlock replacing ad slots with animal photos](store-assets/upload-ready/screenshot-1280x800.jpg)
+
+Instead of leaving awkward blank spaces where ads used to be, CuteBlock keeps the original slot shape and fills it with bundled photos of cats, dogs, birds, and capybaras. Bundled photos are the default, so normal use does not make external image requests.
 
 ## Load It In Chrome Or Edge
 
@@ -16,7 +20,7 @@ Open `test/ad-test.html` in the browser after loading the extension. The fake ad
 ## Current Features
 
 - Manifest V3 extension.
-- DOM-level replacement for common ad selectors, sponsored blocks, and ad-like class/id names.
+- DOM-level replacement for common ad selectors, sponsored blocks, ad iframes, and ad-like class/id names.
 - Starter EasyList-style cosmetic filter support from `filters/cosmetic-lite.txt`.
 - Ghostery's MPL-2.0 filtering engine powers cosmetic rule matching.
 - Reversible replacements when CuteBlock is disabled or paused for the current site.
@@ -25,6 +29,12 @@ Open `test/ad-test.html` in the browser after loading the extension. The fake ad
 - Bundled photos are packaged with the extension, so ad replacement does not require external image requests by default.
 - Optional online dog images via `random.dog`, with `dog.ceo` as a fallback, can be enabled after a warning and permission prompt.
 - Bundled animal photos include wide, rectangle, and tall variants so ad slots get shape-appropriate images.
+
+## Store Materials
+
+- Upload fields: [`CHROME_STORE_UPLOAD_FIELDS.md`](CHROME_STORE_UPLOAD_FIELDS.md)
+- Privacy practice answers: [`CHROME_PRIVACY_PRACTICES_FIELDS.md`](CHROME_PRIVACY_PRACTICES_FIELDS.md)
+- Upload-ready images: [`store-assets/upload-ready`](store-assets/upload-ready)
 
 ## Cosmetic Filter Syntax
 

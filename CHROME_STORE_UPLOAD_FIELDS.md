@@ -17,25 +17,28 @@ Replace annoying ads with cute animals.
 Description:
 
 ```text
-CuteBlock is a playful ad replacement extension that swaps likely ad containers for cute animal photos while preserving the shape of the page.
+CuteBlock is a browser extension that replaces likely ad containers with cute animal photos while preserving the shape of the page.
 
-Instead of removing an ad slot and leaving a blank space behind, CuteBlock replaces obvious ad areas with bundled photos of cats, dogs, birds, and capybaras. It is designed to make browsing feel calmer and a little more delightful without breaking page layouts.
+Instead of removing ad slots and leaving empty spaces behind, CuteBlock swaps obvious ad-shaped areas with bundled photos of cats, dogs, birds, capybaras, and other animals. The result is a calmer, friendlier browsing experience without awkward blank holes in the layout.
+
+Bundled photos are included inside the extension, so no external image requests are made by default. Users can also choose an optional random dog photo mode, which fetches images from random.dog with dog.ceo as a fallback after a warning and browser permission prompt.
 
 Features:
 - Replaces likely ad containers with animal photos.
-- Keeps bundled photos as the default, so no external image requests are needed for normal use.
-- Lets you pause CuteBlock globally.
-- Lets you pause CuteBlock on the current site.
-- Lets you choose an animal theme.
+- Preserves page layout by keeping the original ad slot shape.
+- Uses bundled animal photos by default.
+- Lets you choose animal themes, including cats, dogs, birds, capybaras, and mixed animals.
 - Includes photo fit controls for different ad slot shapes.
-- Includes a replacement level control so you can choose a gentler or more eager experience.
+- Includes a replacement level control for gentler or more eager detection.
+- Lets you pause CuteBlock globally.
+- Lets you pause CuteBlock on specific sites.
 - Offers optional random dog photos through random.dog, with dog.ceo as a fallback, after a warning and browser permission prompt.
 
 Privacy:
-CuteBlock does not collect, sell, or transmit browsing history. Settings are stored with browser extension storage. Bundled photos are loaded from the extension package. Optional random dog images only load if you choose that image source and approve the browser permission prompt.
+CuteBlock does not collect, sell, or transmit your browsing history or personal data. Settings are stored using the browser's extension storage. Bundled photos are loaded from the extension package. Optional random dog photos are only requested if you enable that image source and approve the browser permission prompt.
 
 Why install it?
-If you want fewer annoying ad blocks but do not want pages full of awkward blank holes, CuteBlock turns those spaces into something nicer.
+If you want fewer annoying ad spaces without pages full of blank gaps, CuteBlock turns those spaces into something lighter, friendlier, and more fun.
 ```
 
 Category:
@@ -125,11 +128,11 @@ See CHROME_PRIVACY_PRACTICES_FIELDS.md
 Upload this ZIP:
 
 ```text
-dist/CuteBlock-0.2.2.zip
+dist/CuteBlock-0.2.3.zip
 ```
 
 GitHub release:
 
 ```text
-https://github.com/srkyn/CuteBlock/releases/tag/v0.2.2
+https://github.com/srkyn/CuteBlock/releases/tag/v0.2.3
 ```

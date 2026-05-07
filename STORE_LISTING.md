@@ -2,7 +2,7 @@
 
 ## Single Purpose
 
-CuteBlock replaces obvious ad containers with bundled cute animal photos while preserving the page layout. Users can pause CuteBlock globally or on specific sites.
+CuteBlock replaces likely ad containers with cute animal photos while preserving page layout. Users can pause CuteBlock globally or on specific sites.
 
 ## Short Description
 
@@ -10,14 +10,14 @@ Replace annoying ads with cute animal photos.
 
 ## Detailed Description
 
-CuteBlock is a playful ad replacement extension. Instead of collapsing ad slots and leaving awkward blank space, it swaps likely ad containers for bundled animal photos packaged with the extension. An optional Random dog API mode can be enabled after a warning and browser permission prompt.
+CuteBlock is a playful ad replacement extension. Instead of collapsing ad slots and leaving awkward blank space, it swaps likely ad containers for animal photos while keeping the original slot shape. Bundled photos are packaged with the extension by default. Optional random dog photos can be enabled after a warning and browser permission prompt.
 
 Current controls:
 
 - Pause CuteBlock globally.
 - Pause CuteBlock on the current site.
 - Choose an animal theme.
-- Choose bundled photos or the optional Random dog API.
+- Choose bundled photos or optional random dog photos.
 - Choose photo fit behavior.
 - Adjust replacement level.
 
@@ -31,7 +31,7 @@ Current controls:
 
 - [ ] Run `npm run check`.
 - [ ] Run `npm run package`.
-- [ ] Upload `dist/CuteBlock-0.2.2.zip`.
-- [ ] Add `store-assets/cuteblock-test-page.png` as a screenshot.
+- [ ] Upload `dist/CuteBlock-0.2.3.zip`.
+- [ ] Add `store-assets/upload-ready/screenshot-1280x800.jpg` as a screenshot.
 - [ ] Use `PRIVACY.md` for the privacy policy text or hosted privacy page.
 - [ ] Confirm optional remote dog image behavior is disclosed.

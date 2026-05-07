@@ -11,7 +11,7 @@ CuteBlock replaces likely ad containers in the page with bundled animal photos b
 
 ## Optional Random Dog API Mode
 
-If you choose **Random dog API** in the popup and approve the permission prompt, replaced ad slots may request images from:
+If you choose **Random dog photos** in the popup and approve the permission prompt, replaced ad slots may request images from:
 
 - `https://random.dog/`
 - `https://dog.ceo/`
