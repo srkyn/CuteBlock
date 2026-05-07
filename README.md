@@ -6,6 +6,12 @@ CuteBlock is a playful browser extension that replaces likely ad containers with
 
 Instead of leaving awkward blank spaces where ads used to be, CuteBlock keeps the original slot shape and fills it with bundled photos of cats, dogs, birds, capybaras, foxes, rabbits, and otters. Bundled photos are the default, so normal use does not make external image requests.
 
+## Why It Matters
+
+CuteBlock is a small browser-control project with a privacy-first default: replace the page elements locally, preserve layout, and avoid external image requests unless the user explicitly enables an optional online source.
+
+The project is intentionally lighthearted, but the engineering focus is serious: Manifest V3 permissions, content-script behavior, cosmetic filter parsing, reversible DOM changes, and clear user control from the popup.
+
 ## Load It In Chrome Or Edge
 
 1. Open `chrome://extensions` or `edge://extensions`.
@@ -20,6 +26,7 @@ Open `test/ad-test.html` in the browser after loading the extension. The fake ad
 ## Current Features
 
 - Manifest V3 extension.
+- Minimal default permission model: `storage` only, with online image hosts kept behind optional permissions.
 - DOM-level replacement for common ad selectors, sponsored blocks, ad iframes, and ad-like class/id names.
 - Starter EasyList-style cosmetic filter support from `filters/cosmetic-lite.txt`.
 - Ghostery's MPL-2.0 filtering engine powers cosmetic rule matching.
