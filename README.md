@@ -24,6 +24,7 @@ Open `test/ad-test.html` in the browser after loading the extension. The fake ad
 - Popup settings for enable/disable, current-site control, animal theme, photo fit, and replacement level.
 - Optional online dog images via `random.dog`, with `dog.ceo` as a fallback.
 - Bundled photos remain the default image source, so external image requests are opt-in.
+- Bundled animal photos include wide, rectangle, and tall variants so ad slots get shape-appropriate images.
 
 ## Cosmetic Filter Syntax
 
@@ -67,7 +68,7 @@ npm run check
 
 Bundled photos were resized and center-cropped for use as extension assets.
 
-- Cat: [`Cat-1046544.jpg`](https://commons.wikimedia.org/wiki/File:Cat-1046544.jpg), Wikimedia Commons, CC0 1.0.
-- Dog: [`1Cute-doggy.jpg`](https://commons.wikimedia.org/wiki/File:1Cute-doggy.jpg), Wikimedia Commons, CC0 1.0.
+- Cat: [`House cat lying.jpg`](https://commons.wikimedia.org/wiki/File:House_cat_lying.jpg), Wikimedia Commons, public domain.
+- Dog: [`Dog on grass.jpg`](https://commons.wikimedia.org/wiki/File:Dog_on_grass.jpg), Wikimedia Commons, public domain source.
 - Capybara: [`Bristol.zoo.capybara.arp.jpg`](https://commons.wikimedia.org/wiki/File:Bristol.zoo.capybara.arp.jpg), Wikimedia Commons, public domain.
 - Bird: [`Colorful_Bird.jpg`](https://commons.wikimedia.org/wiki/File:Colorful_Bird.jpg) by Jim, Wikimedia Commons, [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).

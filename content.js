@@ -11466,10 +11466,10 @@
           disabledSites: []
         };
         const ANIMALS = [
-          { theme: "cats", file: "cat.jpg", title: "Cat break", subtitle: "This ad is now a tiny nap zone." },
-          { theme: "dogs", file: "dog.jpg", title: "Dog break", subtitle: "Important update: good vibes detected." },
-          { theme: "capybaras", file: "capybara.jpg", title: "Capybara break", subtitle: "The internet has become calmer here." },
-          { theme: "birds", file: "bird.jpg", title: "Bird break", subtitle: "A small chirp replaced a loud ad." }
+          { theme: "cats", files: { wide: "cat-wide.jpg", rect: "cat-rect.jpg", tall: "cat-tall.jpg" }, title: "Cat break", subtitle: "This ad is now a tiny nap zone." },
+          { theme: "dogs", files: { wide: "dog-wide.jpg", rect: "dog-rect.jpg", tall: "dog-tall.jpg" }, title: "Dog break", subtitle: "Important update: good vibes detected." },
+          { theme: "capybaras", files: { wide: "capybara-wide.jpg", rect: "capybara-rect.jpg", tall: "capybara-tall.jpg" }, title: "Capybara break", subtitle: "The internet has become calmer here." },
+          { theme: "birds", files: { wide: "bird-wide.jpg", rect: "bird-rect.jpg", tall: "bird-tall.jpg" }, title: "Bird break", subtitle: "A small chirp replaced a loud ad." }
         ];
         const DIRECT_SELECTORS = [
           "ins.adsbygoogle",
@@ -11569,14 +11569,23 @@
           }).catch(() => {
           });
         }
-        function resolveAnimalImage(animal) {
+        function getAssetVariant(width, height) {
+          const aspectRatio = width / Math.max(height, 1);
+          if (aspectRatio > 2.35) return "wide";
+          if (aspectRatio < 0.82) return "tall";
+          return "rect";
+        }
+        function getAnimalAssetUrl(animal, width, height) {
+          return getAssetUrl(animal.files[getAssetVariant(width, height)] || animal.files.rect);
+        }
+        function resolveAnimalImage(animal, width, height) {
           if (settings.imageSource !== "online-dogs") {
-            return Promise.resolve(getAssetUrl(animal.file));
+            return Promise.resolve(getAnimalAssetUrl(animal, width, height));
           }
           const cached = remoteImageCache.shift();
           warmRemoteImageCache();
           if (cached) return Promise.resolve(cached);
-          return fetchRemoteDogImage().then((url) => isSupportedRemoteImage(url) ? url : getAssetUrl(animal.file)).catch(() => getAssetUrl(animal.file));
+          return fetchRemoteDogImage().then((url) => isSupportedRemoteImage(url) ? url : getAnimalAssetUrl(animal, width, height)).catch(() => getAnimalAssetUrl(animal, width, height));
         }
         function applyAnimalImage(card, img, url, source) {
           img.src = url;
@@ -11587,7 +11596,7 @@
         function getImageFitMode(width, height) {
           if (settings.imageFit === "cover" || settings.imageFit === "contain") return settings.imageFit;
           const aspectRatio = width / Math.max(height, 1);
-          return aspectRatio > 3.2 || height < 130 ? "contain" : "cover";
+          return settings.imageSource === "online-dogs" && (aspectRatio > 3.2 || height < 130) ? "contain" : "cover";
         }
         function getTokens(element) {
           const parts = [
@@ -11818,10 +11827,10 @@
           img.addEventListener("error", () => {
             card.classList.add("cuteblock-art-error");
           });
-          const fallbackUrl = getAssetUrl(animal.file);
+          const fallbackUrl = getAnimalAssetUrl(animal, width, height);
           applyAnimalImage(card, img, fallbackUrl, "bundled");
           if (settings.imageSource === "online-dogs") {
-            resolveAnimalImage(animal).then((url) => {
+            resolveAnimalImage(animal, width, height).then((url) => {
               applyAnimalImage(card, img, url, "online-dogs");
             });
           }
