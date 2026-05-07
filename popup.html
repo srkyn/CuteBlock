@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CuteBlock</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="popup">
+      <header class="brand">
+        <img src="assets/cat.jpg" alt="" class="brand-mark">
+        <div>
+          <h1>CuteBlock</h1>
+          <p>Replace annoying ads with cute animals.</p>
+        </div>
+      </header>
+
+      <label class="toggle-row">
+        <span>Enabled</span>
+        <input id="enabled" type="checkbox" role="switch">
+      </label>
+
+      <section class="control">
+        <span class="label">Animal theme</span>
+        <select id="theme">
+          <option value="mixed">Mixed</option>
+          <option value="cats">Cats</option>
+          <option value="dogs">Dogs</option>
+          <option value="capybaras">Capybaras</option>
+          <option value="birds">Birds</option>
+        </select>
+      </section>
+
+      <section class="control">
+        <span class="label">Replacement level</span>
+        <div class="segments" role="radiogroup" aria-label="Replacement level">
+          <label><input type="radio" name="density" value="gentle"> Gentle</label>
+          <label><input type="radio" name="density" value="balanced"> Balanced</label>
+          <label><input type="radio" name="density" value="eager"> Eager</label>
+        </div>
+      </section>
+
+      <p id="status" class="status" aria-live="polite"></p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
