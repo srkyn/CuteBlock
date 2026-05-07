@@ -71,4 +71,4 @@ Bundled photos were resized and center-cropped for use as extension assets.
 - Cat: [`House cat lying.jpg`](https://commons.wikimedia.org/wiki/File:House_cat_lying.jpg), Wikimedia Commons, public domain.
 - Dog: [`Dog on grass.jpg`](https://commons.wikimedia.org/wiki/File:Dog_on_grass.jpg), Wikimedia Commons, public domain source.
 - Capybara: [`Bristol.zoo.capybara.arp.jpg`](https://commons.wikimedia.org/wiki/File:Bristol.zoo.capybara.arp.jpg), Wikimedia Commons, public domain.
-- Bird: [`Colorful_Bird.jpg`](https://commons.wikimedia.org/wiki/File:Colorful_Bird.jpg) by Jim, Wikimedia Commons, [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
+- Bird: [`Bird on branch (Unsplash).jpg`](https://commons.wikimedia.org/wiki/File:Bird_on_branch_(Unsplash).jpg) by Pritiranjan Maharana, Wikimedia Commons, [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
