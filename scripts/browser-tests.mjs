@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { extname, join, resolve } from "node:path";
+import { tmpdir } from "node:os";
 import { chromium } from "playwright";
 
 const root = resolve(".");
@@ -63,16 +64,19 @@ async function installHarness(page, origin) {
     let settings = { ...initialSettings };
     const listeners = [];
     const realFetch = window.fetch.bind(window);
+    window.__cuteblockDogRequests = 0;
 
     window.fetch = (input, init) => {
       const url = String(input);
       if (url.startsWith("https://random.dog/")) {
+        window.__cuteblockDogRequests += 1;
         return Promise.resolve(new Response(JSON.stringify({ url: `${testOrigin}/assets/dog-rect.jpg` }), {
           headers: { "content-type": "application/json" }
         }));
       }
 
       if (url.startsWith("https://dog.ceo/")) {
+        window.__cuteblockDogRequests += 1;
         return Promise.resolve(new Response(JSON.stringify({ message: `${testOrigin}/assets/dog-rect.jpg` }), {
           headers: { "content-type": "application/json" }
         }));
@@ -129,7 +133,7 @@ async function run() {
     await page.goto(`${origin}/test/ad-test.html`, { waitUntil: "domcontentloaded" });
     await page.addScriptTag({ path: join(root, "content.js") });
 
-    await page.waitForFunction(() => document.querySelectorAll(".cuteblock-card").length >= 4);
+    await page.waitForFunction(() => document.querySelectorAll(".cuteblock-card").length >= 5);
     assert(await page.locator(".leaderboard-ad .cuteblock-card").count() === 1, "leaderboard ad was not replaced");
     assert(await page.locator("#google_ads_iframe_test .cuteblock-card").count() === 1, "inline ad container was not replaced");
     assert(await page.locator("aside .sponsored-card .cuteblock-card").count() === 1, "sponsored card was not replaced");
@@ -144,6 +148,13 @@ async function run() {
     });
     assert(iframeCardCount === 1, "iframe ad did not receive a replacement card");
 
+    await page.locator(".removable-iframe-slot").evaluate((element) => {
+      const card = element.previousElementSibling;
+      element.remove();
+      return card?.classList.contains("cuteblock-card");
+    });
+    await page.waitForFunction(() => !document.querySelector(".removable-iframe-slot") && document.querySelectorAll("[data-cuteblock-frame-card]").length === 1);
+
     await page.waitForFunction(() => [...document.querySelectorAll(".cuteblock-card")].some((card) => card.parentElement?.classList.contains("dynamic-ad-container")));
     assert(await page.locator(".dynamic-ad-container .cuteblock-card").count() === 1, "dynamic ad was not replaced");
 
@@ -156,11 +167,37 @@ async function run() {
     await setSettings(page, { enabled: true, theme: "birds", imageSource: "online-dogs" });
     await page.waitForFunction(() => [...document.querySelectorAll(".cuteblock-title")].some((title) => title.textContent === "Dog break"));
     assert(await page.locator(".cuteblock-title", { hasText: "Bird break" }).count() === 0, "online dog mode still used non-dog copy");
+    assert(await page.evaluate(() => window.__cuteblockDogRequests) <= 2, "online dog mode made too many remote requests");
 
     console.log("browser ok");
   } finally {
     await browser.close();
-    server.close();
+  }
+
+  await runRealExtensionSmoke(origin);
+  server.close();
+}
+
+async function runRealExtensionSmoke(origin) {
+  const userDataDir = await mkdtemp(join(tmpdir(), "cuteblock-profile-"));
+  const context = await chromium.launchPersistentContext(userDataDir, {
+    headless: false,
+    args: [
+      `--disable-extensions-except=${root}`,
+      `--load-extension=${root}`
+    ]
+  });
+
+  try {
+    const page = await context.newPage();
+    await page.goto(`${origin}/test/ad-test.html`, { waitUntil: "domcontentloaded" });
+    await page.waitForFunction(() => document.querySelectorAll(".cuteblock-card").length >= 5);
+    assert(await page.locator(".leaderboard-ad .cuteblock-card").count() === 1, "real extension did not replace leaderboard ad");
+    assert(await page.locator(".iframe-slot").evaluate((element) => getComputedStyle(element).display) === "none", "real extension did not hide iframe ad");
+    console.log("extension smoke ok");
+  } finally {
+    await context.close();
+    await rm(userDataDir, { recursive: true, force: true });
   }
 }
 

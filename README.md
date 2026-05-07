@@ -63,10 +63,17 @@ Run browser regression tests:
 npm run test:browser
 ```
 
+Create a Chrome Web Store ZIP:
+
+```bash
+npm run package
+```
+
 ## Privacy And Notices
 
 - Privacy notes live in [`PRIVACY.md`](PRIVACY.md).
 - Third-party code and photo notices live in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+- Store listing notes live in [`STORE_LISTING.md`](STORE_LISTING.md).
 
 ## Next Good Steps
 

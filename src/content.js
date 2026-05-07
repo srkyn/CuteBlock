@@ -50,11 +50,15 @@ import { FiltersEngine } from "@ghostery/adblocker";
   const MAX_HINT_ELEMENTS = 1200;
   const MAX_SELECTOR_MATCHES = 200;
   const MAX_HEURISTIC_CANDIDATES = 600;
+  const MAX_REMOTE_IMAGE_REQUESTS = 8;
+  const REMOTE_IMAGE_CACHE_LIMIT = 3;
 
   let settings = { ...DEFAULT_SETTINGS };
   let filterEngine = null;
   let cosmeticExceptionRules = [];
   let scanTimer = null;
+  let remoteImageRequests = 0;
+  let remoteImageInFlight = null;
   const pendingScanRoots = new Set();
   const replaced = new WeakMap();
   const remoteImageCache = [];
@@ -127,12 +131,35 @@ import { FiltersEngine } from "@ghostery/adblocker";
   }
 
   function warmRemoteImageCache() {
-    if (settings.imageSource !== "online-dogs" || remoteImageCache.length >= 3) return;
-    fetchRemoteDogImage()
+    if (settings.imageSource !== "online-dogs"
+      || remoteImageCache.length >= REMOTE_IMAGE_CACHE_LIMIT
+      || remoteImageInFlight
+      || remoteImageRequests >= MAX_REMOTE_IMAGE_REQUESTS) return;
+
+    remoteImageRequests += 1;
+    remoteImageInFlight = fetchRemoteDogImage()
       .then((url) => {
         if (isSupportedRemoteImage(url)) remoteImageCache.push(url);
+        return url;
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        remoteImageInFlight = null;
+      });
+  }
+
+  function requestRemoteDogImage() {
+    if (remoteImageCache.length) return Promise.resolve(remoteImageCache.shift());
+    if (remoteImageRequests >= MAX_REMOTE_IMAGE_REQUESTS) return Promise.reject(new Error("Remote image request cap reached."));
+    if (remoteImageInFlight) return remoteImageInFlight;
+
+    remoteImageRequests += 1;
+    remoteImageInFlight = fetchRemoteDogImage()
+      .finally(() => {
+        remoteImageInFlight = null;
+      });
+
+    return remoteImageInFlight;
   }
 
   function getAssetVariant(width, height) {
@@ -151,11 +178,9 @@ import { FiltersEngine } from "@ghostery/adblocker";
       return Promise.resolve(getAnimalAssetUrl(animal, width, height));
     }
 
-    const cached = remoteImageCache.shift();
     warmRemoteImageCache();
-    if (cached) return Promise.resolve(cached);
 
-    return fetchRemoteDogImage()
+    return requestRemoteDogImage()
       .then((url) => isSupportedRemoteImage(url) ? url : getAnimalAssetUrl(animal, width, height))
       .catch(() => getAnimalAssetUrl(animal, width, height));
   }
@@ -269,7 +294,15 @@ import { FiltersEngine } from "@ghostery/adblocker";
   }
 
   function hasCosmeticException(element) {
-    return cosmeticExceptionRules.some((rule) => safeMatches(element, rule.selector));
+    return cosmeticExceptionRules.some((rule) => safeMatches(element, rule.selector) || safeClosest(element, rule.selector));
+  }
+
+  function safeClosest(element, selector) {
+    try {
+      return element.closest(selector);
+    } catch {
+      return null;
+    }
   }
 
   function splitSelectorList(selectorList) {
@@ -562,6 +595,7 @@ import { FiltersEngine } from "@ghostery/adblocker";
 
     card.style.setProperty("width", `${Math.max(Math.round(rect.width), 72)}px`, "important");
     card.style.setProperty("max-width", "100%", "important");
+    card.setAttribute("data-cuteblock-frame-card", "true");
     target.before(card);
     replaced.set(target, original);
     target.setAttribute(REPLACED_ATTR, "true");
@@ -644,6 +678,7 @@ import { FiltersEngine } from "@ghostery/adblocker";
     const observer = new MutationObserver((mutations) => {
       if (!isActive()) return;
       for (const mutation of mutations) {
+        for (const node of mutation.removedNodes) cleanupRemovedNode(node);
         for (const node of mutation.addedNodes) {
           if (node instanceof HTMLElement && !node.closest(".cuteblock-card")) scheduleScan(node);
         }
@@ -654,6 +689,20 @@ import { FiltersEngine } from "@ghostery/adblocker";
       childList: true,
       subtree: true
     });
+  }
+
+  function cleanupRemovedNode(node) {
+    if (!(node instanceof HTMLElement)) return;
+    cleanupRemovedElement(node);
+    node.querySelectorAll?.(`[${REPLACED_ATTR}]`).forEach(cleanupRemovedElement);
+  }
+
+  function cleanupRemovedElement(element) {
+    const original = replaced.get(element);
+    if (original?.mode === "hidden-frame") {
+      original.card?.remove();
+      replaced.delete(element);
+    }
   }
 
   Promise.all([
