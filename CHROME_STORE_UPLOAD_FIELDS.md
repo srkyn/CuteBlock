@@ -128,11 +128,11 @@ See CHROME_PRIVACY_PRACTICES_FIELDS.md
 Upload this ZIP:
 
 ```text
-dist/CuteBlock-0.2.4.zip
+dist/CuteBlock-0.2.5.zip
 ```
 
 GitHub release:
 
 ```text
-https://github.com/srkyn/CuteBlock/releases/tag/v0.2.4
+https://github.com/srkyn/CuteBlock/releases/tag/v0.2.5
 ```

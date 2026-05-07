@@ -31,7 +31,7 @@ Current controls:
 
 - [ ] Run `npm run check`.
 - [ ] Run `npm run package`.
-- [ ] Upload `dist/CuteBlock-0.2.4.zip`.
+- [ ] Upload `dist/CuteBlock-0.2.5.zip`.
 - [ ] Add `store-assets/upload-ready/screenshot-1280x800.jpg` as a screenshot.
 - [ ] Use `PRIVACY.md` for the privacy policy text or hosted privacy page.
 - [ ] Confirm optional remote dog image behavior is disclosed.
