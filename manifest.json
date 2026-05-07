@@ -12,7 +12,9 @@
     "storage"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "<all_urls>",
+    "https://random.dog/*",
+    "https://dog.ceo/*"
   ],
   "content_scripts": [
     {

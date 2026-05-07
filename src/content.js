@@ -9,6 +9,7 @@ import { FiltersEngine } from "@ghostery/adblocker";
     enabled: true,
     theme: "mixed",
     density: "balanced",
+    imageSource: "local",
     disabledSites: []
   };
 
@@ -48,6 +49,7 @@ import { FiltersEngine } from "@ghostery/adblocker";
   let cosmeticExceptionRules = [];
   let scanTimer = null;
   const replaced = new WeakMap();
+  const remoteImageCache = [];
 
   const getAssetUrl = (file) => chrome.runtime.getURL(`assets/${file}`);
 
@@ -83,6 +85,52 @@ import { FiltersEngine } from "@ghostery/adblocker";
       : ANIMALS.filter((animal) => animal.theme === settings.theme);
     const choices = pool.length ? pool : ANIMALS;
     return choices[Math.floor(Math.random() * choices.length)];
+  }
+
+  function isSupportedRemoteImage(url) {
+    return /\.(avif|jpe?g|png|webp)(\?.*)?$/i.test(url);
+  }
+
+  function fetchJson(url) {
+    return fetch(url, { cache: "no-store" }).then((response) => {
+      if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+      return response.json();
+    });
+  }
+
+  function fetchRemoteDogImage(attempt = 0) {
+    if (attempt > 3) return Promise.reject(new Error("No supported dog image returned."));
+
+    return fetchJson("https://random.dog/woof.json")
+      .then((data) => data.url)
+      .then((url) => {
+        if (isSupportedRemoteImage(url)) return url;
+        return fetchRemoteDogImage(attempt + 1);
+      })
+      .catch(() => fetchJson("https://dog.ceo/api/breeds/image/random").then((data) => data.message));
+  }
+
+  function warmRemoteImageCache() {
+    if (settings.imageSource !== "online-dogs" || remoteImageCache.length >= 3) return;
+    fetchRemoteDogImage()
+      .then((url) => {
+        if (isSupportedRemoteImage(url)) remoteImageCache.push(url);
+      })
+      .catch(() => {});
+  }
+
+  function resolveAnimalImage(animal) {
+    if (settings.imageSource !== "online-dogs") {
+      return Promise.resolve(getAssetUrl(animal.file));
+    }
+
+    const cached = remoteImageCache.shift();
+    warmRemoteImageCache();
+    if (cached) return Promise.resolve(cached);
+
+    return fetchRemoteDogImage()
+      .then((url) => isSupportedRemoteImage(url) ? url : getAssetUrl(animal.file))
+      .catch(() => getAssetUrl(animal.file));
   }
 
   function getTokens(element) {
@@ -358,9 +406,15 @@ import { FiltersEngine } from "@ghostery/adblocker";
 
     const img = document.createElement("img");
     img.className = "cuteblock-art";
-    img.src = getAssetUrl(animal.file);
     img.alt = "";
     img.loading = "lazy";
+    img.decoding = "async";
+
+    resolveAnimalImage(animal).then((url) => {
+      img.src = url;
+      card.style.setProperty("background-image", `url("${url.replaceAll("\"", "%22")}")`, "important");
+      card.classList.add("cuteblock-has-art");
+    });
 
     const copy = document.createElement("span");
     copy.className = "cuteblock-copy";

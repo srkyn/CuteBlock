@@ -22,7 +22,8 @@ Open `test/ad-test.html` in the browser after loading the extension. The fake ad
 - Reversible replacements when CuteBlock is disabled or paused for the current site.
 - MutationObserver support for ads inserted after page load.
 - Popup settings for enable/disable, current-site control, animal theme, and replacement level.
-- No external image requests.
+- Optional online dog images via `random.dog`, with `dog.ceo` as a fallback.
+- Bundled photos remain the default image source, so external image requests are opt-in.
 
 ## Cosmetic Filter Syntax
 

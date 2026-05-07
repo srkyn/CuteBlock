@@ -3,6 +3,7 @@ const DEFAULT_SETTINGS = {
   enabled: true,
   theme: "mixed",
   density: "balanced",
+  imageSource: "local",
   disabledSites: []
 };
 
@@ -10,6 +11,7 @@ const enabled = document.querySelector("#enabled");
 const siteEnabled = document.querySelector("#site-enabled");
 const siteLabel = document.querySelector("#site-label");
 const theme = document.querySelector("#theme");
+const imageSource = document.querySelector("#image-source");
 const status = document.querySelector("#status");
 const densityInputs = [...document.querySelectorAll("input[name='density']")];
 
@@ -47,6 +49,7 @@ function setStatus(message) {
 function render() {
   enabled.checked = settings.enabled;
   theme.value = settings.theme;
+  imageSource.value = settings.imageSource;
   siteEnabled.checked = !isCurrentSiteDisabled();
   siteEnabled.disabled = !currentHost;
   siteLabel.textContent = currentHost ? `Allow on ${currentHost}` : "Current site";
@@ -60,6 +63,7 @@ function collectSettings() {
     ...settings,
     enabled: enabled.checked,
     theme: theme.value,
+    imageSource: imageSource.value,
     density: getSelectedDensity()
   };
 }
@@ -95,5 +99,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
 
 enabled.addEventListener("change", () => save());
 theme.addEventListener("change", () => save());
+imageSource.addEventListener("change", () => save());
 siteEnabled.addEventListener("change", () => setSiteEnabled(siteEnabled.checked));
 densityInputs.forEach((input) => input.addEventListener("change", () => save()));
