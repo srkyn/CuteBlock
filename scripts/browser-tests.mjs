@@ -164,6 +164,11 @@ async function run() {
     const restoredIframeDisplay = await page.locator(".iframe-slot").evaluate((element) => getComputedStyle(element).display);
     assert(restoredIframeDisplay !== "none", "disable did not restore iframe visibility");
 
+    for (const [theme, title] of [["foxes", "Fox break"], ["rabbits", "Rabbit break"], ["otters", "Otter break"]]) {
+      await setSettings(page, { enabled: true, theme, imageSource: "local" });
+      await page.waitForFunction((expectedTitle) => [...document.querySelectorAll(".cuteblock-title")].some((node) => node.textContent === expectedTitle), title);
+    }
+
     await setSettings(page, { enabled: true, theme: "birds", imageSource: "online-dogs" });
     await page.waitForFunction(() => [...document.querySelectorAll(".cuteblock-title")].some((title) => title.textContent === "Dog break"));
     assert(await page.locator(".cuteblock-title", { hasText: "Bird break" }).count() === 0, "online dog mode still used non-dog copy");

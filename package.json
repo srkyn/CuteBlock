@@ -1,6 +1,6 @@
 {
   "name": "cuteblock",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "CuteBlock is a playful browser extension that replaces likely ad containers with cute animal photos instead of collapsing the page layout.",
   "private": true,
   "directories": {

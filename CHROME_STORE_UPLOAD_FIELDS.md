@@ -19,7 +19,7 @@ Description:
 ```text
 CuteBlock is a browser extension that replaces likely ad containers with cute animal photos while preserving the shape of the page.
 
-Instead of removing ad slots and leaving empty spaces behind, CuteBlock swaps obvious ad-shaped areas with bundled photos of cats, dogs, birds, capybaras, and other animals. The result is a calmer, friendlier browsing experience without awkward blank holes in the layout.
+Instead of removing ad slots and leaving empty spaces behind, CuteBlock swaps obvious ad-shaped areas with bundled photos of cats, dogs, birds, capybaras, foxes, rabbits, otters, and other animals. The result is a calmer, friendlier browsing experience without awkward blank holes in the layout.
 
 Bundled photos are included inside the extension, so no external image requests are made by default. Users can also choose an optional random dog photo mode, which fetches images from random.dog with dog.ceo as a fallback after a warning and browser permission prompt.
 
@@ -27,7 +27,7 @@ Features:
 - Replaces likely ad containers with animal photos.
 - Preserves page layout by keeping the original ad slot shape.
 - Uses bundled animal photos by default.
-- Lets you choose animal themes, including cats, dogs, birds, capybaras, and mixed animals.
+- Lets you choose animal themes, including cats, dogs, birds, capybaras, foxes, rabbits, otters, and mixed animals.
 - Includes photo fit controls for different ad slot shapes.
 - Includes a replacement level control for gentler or more eager detection.
 - Lets you pause CuteBlock globally.
@@ -128,11 +128,11 @@ See CHROME_PRIVACY_PRACTICES_FIELDS.md
 Upload this ZIP:
 
 ```text
-dist/CuteBlock-0.2.3.zip
+dist/CuteBlock-0.2.4.zip
 ```
 
 GitHub release:
 
 ```text
-https://github.com/srkyn/CuteBlock/releases/tag/v0.2.3
+https://github.com/srkyn/CuteBlock/releases/tag/v0.2.4
 ```

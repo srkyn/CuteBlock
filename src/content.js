@@ -18,7 +18,10 @@ import { FiltersEngine } from "@ghostery/adblocker";
     { theme: "cats", files: { wide: "cat-wide.jpg", rect: "cat-rect.jpg", tall: "cat-tall.jpg" }, title: "Cat break", subtitle: "This ad is now a tiny nap zone." },
     { theme: "dogs", files: { wide: "dog-wide.jpg", rect: "dog-rect.jpg", tall: "dog-tall.jpg" }, title: "Dog break", subtitle: "Important update: good vibes detected." },
     { theme: "capybaras", files: { wide: "capybara-wide.jpg", rect: "capybara-rect.jpg", tall: "capybara-tall.jpg" }, title: "Capybara break", subtitle: "The internet has become calmer here." },
-    { theme: "birds", files: { wide: "bird-wide.jpg", rect: "bird-rect.jpg", tall: "bird-tall.jpg" }, title: "Bird break", subtitle: "A small chirp replaced a loud ad." }
+    { theme: "birds", files: { wide: "bird-wide.jpg", rect: "bird-rect.jpg", tall: "bird-tall.jpg" }, title: "Bird break", subtitle: "A small chirp replaced a loud ad." },
+    { theme: "foxes", files: { wide: "fox-wide.jpg", rect: "fox-rect.jpg", tall: "fox-tall.jpg" }, title: "Fox break", subtitle: "This ad wandered into the woods." },
+    { theme: "rabbits", files: { wide: "rabbit-wide.jpg", rect: "rabbit-rect.jpg", tall: "rabbit-tall.jpg" }, title: "Rabbit break", subtitle: "A softer hop took over this slot." },
+    { theme: "otters", files: { wide: "otter-wide.jpg", rect: "otter-rect.jpg", tall: "otter-tall.jpg" }, title: "Otter break", subtitle: "The internet is floating easier here." }
   ];
 
   const DIRECT_SELECTORS = [

@@ -10,7 +10,7 @@ Replace annoying ads with cute animal photos.
 
 ## Detailed Description
 
-CuteBlock is a playful ad replacement extension. Instead of collapsing ad slots and leaving awkward blank space, it swaps likely ad containers for animal photos while keeping the original slot shape. Bundled photos are packaged with the extension by default. Optional random dog photos can be enabled after a warning and browser permission prompt.
+CuteBlock is a playful ad replacement extension. Instead of collapsing ad slots and leaving awkward blank space, it swaps likely ad containers for animal photos while keeping the original slot shape. Bundled photos are packaged with the extension by default, including cats, dogs, birds, capybaras, foxes, rabbits, and otters. Optional random dog photos can be enabled after a warning and browser permission prompt.
 
 Current controls:
 
@@ -31,7 +31,7 @@ Current controls:
 
 - [ ] Run `npm run check`.
 - [ ] Run `npm run package`.
-- [ ] Upload `dist/CuteBlock-0.2.3.zip`.
+- [ ] Upload `dist/CuteBlock-0.2.4.zip`.
 - [ ] Add `store-assets/upload-ready/screenshot-1280x800.jpg` as a screenshot.
 - [ ] Use `PRIVACY.md` for the privacy policy text or hosted privacy page.
 - [ ] Confirm optional remote dog image behavior is disclosed.
