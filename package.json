@@ -1,0 +1,33 @@
+{
+  "name": "cuteblock",
+  "version": "0.2.0",
+  "description": "CuteBlock is a playful browser extension that replaces obvious ad containers with cute animal photos instead of collapsing the page layout.",
+  "private": true,
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build": "esbuild src/content.js --bundle --format=iife --target=chrome110,firefox110 --outfile=content.js --legal-comments=none",
+    "check": "npm run check:static && node scripts/browser-tests.mjs",
+    "check:static": "npm run build && node --check content.js && node --check popup.js && node scripts/check-engine.mjs && node -e \"JSON.parse(require('fs').readFileSync('manifest.json','utf8')); console.log('manifest ok')\"",
+    "package": "npm run check:static && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-extension.ps1",
+    "test:browser": "npm run build && node scripts/browser-tests.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/srkyn/CuteBlock.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MPL-2.0",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/srkyn/CuteBlock/issues"
+  },
+  "homepage": "https://github.com/srkyn/CuteBlock#readme",
+  "devDependencies": {
+    "@ghostery/adblocker": "^2.15.0",
+    "esbuild": "^0.27.7",
+    "playwright": "^1.57.0"
+  }
+}

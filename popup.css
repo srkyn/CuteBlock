@@ -44,7 +44,8 @@ p {
 }
 
 .toggle-row,
-.control {
+.control,
+.credits {
   background: #ffffff;
   border: 1px solid #dce6df;
   border-radius: 8px;
@@ -115,4 +116,21 @@ select {
   font-size: 12px;
   font-weight: 750;
   min-height: 16px;
+}
+
+.credits {
+  color: #344652;
+  font-size: 12px;
+}
+
+.credits summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.credits ul {
+  display: grid;
+  gap: 5px;
+  margin: 10px 0 0;
+  padding-left: 18px;
 }

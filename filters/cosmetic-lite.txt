@@ -1,0 +1,39 @@
+! CuteBlock starter cosmetic filters
+! EasyList-style syntax subset supported:
+!   ##selector
+!   domain.com##selector
+!   domain.com,~excluded.com##selector
+!   #@# exception rules
+
+##.ad-container
+##.ad-wrapper
+##.ad-unit
+##.ad-slot
+##.advertisement
+##.advertising
+##.banner-ad
+##.sponsored-card
+##.sponsored-post
+##.sponsored-content
+##.promoted-post
+##.native-ad
+##.taboola
+##.outbrain
+##.mgid
+##ins.adsbygoogle
+##[data-ad]
+##[data-ad-client]
+##[data-ad-slot]
+##[aria-label="Advertisement"]
+##[aria-label="advertisement"]
+##[aria-label="Sponsored"]
+##[aria-label="sponsored"]
+##iframe[src*="doubleclick.net"]
+##iframe[src*="googlesyndication.com"]
+##iframe[src*="adservice.google."]
+##iframe[src*="amazon-adsystem.com"]
+
+youtube.com#@#.ad
+github.com#@#.ad
+localhost#@#.ad
+127.0.0.1#@#.ad

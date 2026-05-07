@@ -1,7 +1,11 @@
 .cuteblock-card {
   --cuteblock-ink: #ffffff;
+  --cuteblock-image-fit: cover;
   --cuteblock-muted: rgba(255, 255, 255, 0.86);
   background: #1e2d34 !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: var(--cuteblock-image-fit) !important;
   border: 1px solid rgba(24, 38, 48, 0.16) !important;
   box-sizing: border-box !important;
   color: var(--cuteblock-ink) !important;
@@ -34,10 +38,38 @@
   height: 100% !important;
   inset: 0 !important;
   min-height: 72px !important;
-  object-fit: cover !important;
+  object-fit: var(--cuteblock-image-fit) !important;
   position: absolute !important;
   width: 100% !important;
   z-index: 0 !important;
+}
+
+.cuteblock-card.cuteblock-fit-contain {
+  --cuteblock-image-fit: contain;
+}
+
+.cuteblock-card.cuteblock-fit-contain::before {
+  background: inherit !important;
+  background-size: cover !important;
+  content: "" !important;
+  filter: blur(14px) saturate(0.95) brightness(0.72) !important;
+  inset: -18px !important;
+  opacity: 0.9 !important;
+  position: absolute !important;
+  transform: scale(1.05) !important;
+  z-index: 0 !important;
+}
+
+.cuteblock-card.cuteblock-fit-contain .cuteblock-art {
+  z-index: 1 !important;
+}
+
+.cuteblock-card.cuteblock-fit-contain::after {
+  z-index: 2 !important;
+}
+
+.cuteblock-card.cuteblock-art-error {
+  outline: 3px solid rgba(220, 77, 77, 0.75) !important;
 }
 
 .cuteblock-copy {
@@ -50,7 +82,7 @@
   min-width: 0 !important;
   padding: clamp(7px, 2%, 12px) clamp(9px, 2.5%, 14px) !important;
   position: absolute !important;
-  z-index: 2 !important;
+  z-index: 3 !important;
 }
 
 .cuteblock-title {
