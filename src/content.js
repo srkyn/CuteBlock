@@ -9,7 +9,6 @@ import { FiltersEngine } from "@ghostery/adblocker";
     enabled: true,
     theme: "mixed",
     density: "balanced",
-    imageSource: "local",
     imageFit: "smart",
     disabledSites: []
   };
@@ -50,18 +49,13 @@ import { FiltersEngine } from "@ghostery/adblocker";
   const MAX_HINT_ELEMENTS = 1200;
   const MAX_SELECTOR_MATCHES = 200;
   const MAX_HEURISTIC_CANDIDATES = 600;
-  const MAX_REMOTE_IMAGE_REQUESTS = 8;
-  const REMOTE_IMAGE_CACHE_LIMIT = 3;
 
   let settings = { ...DEFAULT_SETTINGS };
   let filterEngine = null;
   let cosmeticExceptionRules = [];
   let scanTimer = null;
-  let remoteImageRequests = 0;
-  let remoteImageInFlight = null;
   const pendingScanRoots = new Set();
   const replaced = new WeakMap();
-  const remoteImageCache = [];
 
   const getAssetUrl = (file) => chrome.runtime.getURL(`assets/${file}`);
 
@@ -99,69 +93,6 @@ import { FiltersEngine } from "@ghostery/adblocker";
     return choices[Math.floor(Math.random() * choices.length)];
   }
 
-  function pickCardAnimal() {
-    if (settings.imageSource === "online-dogs") {
-      return ANIMALS.find((animal) => animal.theme === "dogs") || ANIMALS[0];
-    }
-
-    return pickAnimal();
-  }
-
-  function isSupportedRemoteImage(url) {
-    return /\.(avif|jpe?g|png|webp)(\?.*)?$/i.test(url);
-  }
-
-  function fetchJson(url) {
-    return fetch(url, { cache: "no-store" }).then((response) => {
-      if (!response.ok) throw new Error(`Request failed: ${response.status}`);
-      return response.json();
-    });
-  }
-
-  function fetchRemoteDogImage(attempt = 0) {
-    if (attempt > 3) return Promise.reject(new Error("No supported dog image returned."));
-
-    return fetchJson("https://random.dog/woof.json")
-      .then((data) => data.url)
-      .then((url) => {
-        if (isSupportedRemoteImage(url)) return url;
-        return fetchRemoteDogImage(attempt + 1);
-      })
-      .catch(() => fetchJson("https://dog.ceo/api/breeds/image/random").then((data) => data.message));
-  }
-
-  function warmRemoteImageCache() {
-    if (settings.imageSource !== "online-dogs"
-      || remoteImageCache.length >= REMOTE_IMAGE_CACHE_LIMIT
-      || remoteImageInFlight
-      || remoteImageRequests >= MAX_REMOTE_IMAGE_REQUESTS) return;
-
-    remoteImageRequests += 1;
-    remoteImageInFlight = fetchRemoteDogImage()
-      .then((url) => {
-        if (isSupportedRemoteImage(url)) remoteImageCache.push(url);
-        return url;
-      })
-      .catch(() => {})
-      .finally(() => {
-        remoteImageInFlight = null;
-      });
-  }
-
-  function requestRemoteDogImage() {
-    if (remoteImageCache.length) return Promise.resolve(remoteImageCache.shift());
-    if (remoteImageRequests >= MAX_REMOTE_IMAGE_REQUESTS) return Promise.reject(new Error("Remote image request cap reached."));
-    if (remoteImageInFlight) return remoteImageInFlight;
-
-    remoteImageRequests += 1;
-    remoteImageInFlight = fetchRemoteDogImage()
-      .finally(() => {
-        remoteImageInFlight = null;
-      });
-
-    return remoteImageInFlight;
-  }
-
   function getAssetVariant(width, height) {
     const aspectRatio = width / Math.max(height, 1);
     if (aspectRatio > 2.35) return "wide";
@@ -173,18 +104,6 @@ import { FiltersEngine } from "@ghostery/adblocker";
     return getAssetUrl(animal.files[getAssetVariant(width, height)] || animal.files.rect);
   }
 
-  function resolveAnimalImage(animal, width, height) {
-    if (settings.imageSource !== "online-dogs") {
-      return Promise.resolve(getAnimalAssetUrl(animal, width, height));
-    }
-
-    warmRemoteImageCache();
-
-    return requestRemoteDogImage()
-      .then((url) => isSupportedRemoteImage(url) ? url : getAnimalAssetUrl(animal, width, height))
-      .catch(() => getAnimalAssetUrl(animal, width, height));
-  }
-
   function applyAnimalImage(card, img, url, source) {
     img.src = url;
     img.dataset.cuteblockImageSource = source;
@@ -194,8 +113,7 @@ import { FiltersEngine } from "@ghostery/adblocker";
 
   function getImageFitMode(width, height) {
     if (settings.imageFit === "cover" || settings.imageFit === "contain") return settings.imageFit;
-    const aspectRatio = width / Math.max(height, 1);
-    return settings.imageSource === "online-dogs" && (aspectRatio > 3.2 || height < 130) ? "contain" : "cover";
+    return "cover";
   }
 
   function getTokens(element) {
@@ -493,7 +411,7 @@ import { FiltersEngine } from "@ghostery/adblocker";
   }
 
   function createCard(width, height) {
-    const animal = pickCardAnimal();
+    const animal = pickAnimal();
     const compact = width < 180 || height < 95;
     const fitMode = getImageFitMode(width, height);
     const card = document.createElement("div");
@@ -518,12 +436,6 @@ import { FiltersEngine } from "@ghostery/adblocker";
 
     const fallbackUrl = getAnimalAssetUrl(animal, width, height);
     applyAnimalImage(card, img, fallbackUrl, "bundled");
-
-    if (settings.imageSource === "online-dogs") {
-      resolveAnimalImage(animal, width, height).then((url) => {
-        applyAnimalImage(card, img, url, "online-dogs");
-      });
-    }
 
     const copy = document.createElement("span");
     copy.className = "cuteblock-copy";
@@ -732,8 +644,13 @@ import { FiltersEngine } from "@ghostery/adblocker";
 
   function settingsRequireRefresh(previous, next) {
     return previous.theme !== next.theme
-      || previous.imageSource !== next.imageSource
       || previous.imageFit !== next.imageFit
       || previous.density !== next.density;
   }
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message?.type !== "cuteblock-get-page-info") return false;
+    sendResponse({ hostname: currentHostname() });
+    return false;
+  });
 })();

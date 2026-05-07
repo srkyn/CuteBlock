@@ -29,10 +29,9 @@ Features:
 - Lets you choose an animal theme.
 - Includes photo fit controls for different ad slot shapes.
 - Includes a replacement level control so you can choose a gentler or more eager experience.
-- Offers optional random dog photos through random.dog, with dog.ceo as a fallback.
 
 Privacy:
-CuteBlock does not collect, sell, or transmit browsing history. Settings are stored with browser extension storage. Bundled photos are loaded from the extension package. Optional random dog images only load if you choose that image source in the popup.
+CuteBlock does not collect, sell, or transmit browsing history. Settings are stored with browser extension storage. Bundled photos are loaded from the extension package.
 
 Why install it?
 If you want fewer annoying ad blocks but do not want pages full of awkward blank holes, CuteBlock turns those spaces into something nicer.
@@ -125,11 +124,11 @@ See CHROME_PRIVACY_PRACTICES_FIELDS.md
 Upload this ZIP:
 
 ```text
-dist/CuteBlock-0.2.0.zip
+dist/CuteBlock-0.2.1.zip
 ```
 
 GitHub release:
 
 ```text
-https://github.com/srkyn/CuteBlock/releases/tag/v0.2.0
+https://github.com/srkyn/CuteBlock/releases/tag/v0.2.1
 ```

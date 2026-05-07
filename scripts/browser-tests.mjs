@@ -9,7 +9,6 @@ const defaultSettings = {
   enabled: true,
   theme: "mixed",
   density: "balanced",
-  imageSource: "local",
   imageFit: "smart",
   disabledSites: []
 };
@@ -63,28 +62,6 @@ async function installHarness(page, origin) {
   await page.addInitScript(({ initialSettings, testOrigin }) => {
     let settings = { ...initialSettings };
     const listeners = [];
-    const realFetch = window.fetch.bind(window);
-    window.__cuteblockDogRequests = 0;
-
-    window.fetch = (input, init) => {
-      const url = String(input);
-      if (url.startsWith("https://random.dog/")) {
-        window.__cuteblockDogRequests += 1;
-        return Promise.resolve(new Response(JSON.stringify({ url: `${testOrigin}/assets/dog-rect.jpg` }), {
-          headers: { "content-type": "application/json" }
-        }));
-      }
-
-      if (url.startsWith("https://dog.ceo/")) {
-        window.__cuteblockDogRequests += 1;
-        return Promise.resolve(new Response(JSON.stringify({ message: `${testOrigin}/assets/dog-rect.jpg` }), {
-          headers: { "content-type": "application/json" }
-        }));
-      }
-
-      return realFetch(input, init);
-    };
-
     window.chrome = {
       runtime: {
         getURL(path) {
@@ -164,10 +141,8 @@ async function run() {
     const restoredIframeDisplay = await page.locator(".iframe-slot").evaluate((element) => getComputedStyle(element).display);
     assert(restoredIframeDisplay !== "none", "disable did not restore iframe visibility");
 
-    await setSettings(page, { enabled: true, theme: "birds", imageSource: "online-dogs" });
-    await page.waitForFunction(() => [...document.querySelectorAll(".cuteblock-title")].some((title) => title.textContent === "Dog break"));
-    assert(await page.locator(".cuteblock-title", { hasText: "Bird break" }).count() === 0, "online dog mode still used non-dog copy");
-    assert(await page.evaluate(() => window.__cuteblockDogRequests) <= 2, "online dog mode made too many remote requests");
+    await setSettings(page, { enabled: true, theme: "birds" });
+    await page.waitForFunction(() => [...document.querySelectorAll(".cuteblock-title")].some((title) => title.textContent === "Bird break"));
 
     console.log("browser ok");
   } finally {

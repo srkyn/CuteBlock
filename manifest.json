@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "CuteBlock",
   "description": "Replace annoying ads with cute animals.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "icons": {
     "16": "assets/icons/icon-16.png",
     "32": "assets/icons/icon-32.png",
@@ -20,12 +20,7 @@
     }
   },
   "permissions": [
-    "activeTab",
     "storage"
-  ],
-  "host_permissions": [
-    "https://random.dog/*",
-    "https://dog.ceo/*"
   ],
   "content_scripts": [
     {

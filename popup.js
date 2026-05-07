@@ -3,7 +3,6 @@ const DEFAULT_SETTINGS = {
   enabled: true,
   theme: "mixed",
   density: "balanced",
-  imageSource: "local",
   imageFit: "smart",
   disabledSites: []
 };
@@ -12,7 +11,6 @@ const enabled = document.querySelector("#enabled");
 const siteEnabled = document.querySelector("#site-enabled");
 const siteLabel = document.querySelector("#site-label");
 const theme = document.querySelector("#theme");
-const imageSource = document.querySelector("#image-source");
 const imageFit = document.querySelector("#image-fit");
 const status = document.querySelector("#status");
 const densityInputs = [...document.querySelectorAll("input[name='density']")];
@@ -51,7 +49,6 @@ function setStatus(message) {
 function render() {
   enabled.checked = settings.enabled;
   theme.value = settings.theme;
-  imageSource.value = settings.imageSource;
   imageFit.value = settings.imageFit;
   siteEnabled.checked = !isCurrentSiteDisabled();
   siteEnabled.disabled = !currentHost;
@@ -66,7 +63,6 @@ function collectSettings() {
     ...settings,
     enabled: enabled.checked,
     theme: theme.value,
-    imageSource: imageSource.value,
     imageFit: imageFit.value,
     density: getSelectedDensity()
   };
@@ -88,22 +84,27 @@ function setSiteEnabled(isEnabled) {
   save({ ...collectSettings(), disabledSites });
 }
 
-chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-  try {
-    currentHost = tab?.url ? new URL(tab.url).hostname.toLowerCase() : "";
-  } catch {
-    currentHost = "";
-  }
-
+function loadSettings() {
   chrome.storage.sync.get({ [SETTINGS_KEY]: DEFAULT_SETTINGS }, (stored) => {
     settings = normalizeSettings(stored[SETTINGS_KEY]);
     render();
+  });
+}
+
+chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+  if (!tab?.id) {
+    loadSettings();
+    return;
+  }
+
+  chrome.tabs.sendMessage(tab.id, { type: "cuteblock-get-page-info" }, (response) => {
+    currentHost = response?.hostname || "";
+    loadSettings();
   });
 });
 
 enabled.addEventListener("change", () => save());
 theme.addEventListener("change", () => save());
-imageSource.addEventListener("change", () => save());
 imageFit.addEventListener("change", () => save());
 siteEnabled.addEventListener("change", () => setSiteEnabled(siteEnabled.checked));
 densityInputs.forEach((input) => input.addEventListener("change", () => save()));
