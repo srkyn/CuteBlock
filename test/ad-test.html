@@ -30,7 +30,8 @@
 
       .leaderboard-ad,
       .sponsored-card,
-      #google_ads_iframe_test {
+      #google_ads_iframe_test,
+      .iframe-slot {
         align-items: center;
         background: repeating-linear-gradient(45deg, #eceff3, #eceff3 12px, #d8dee6 12px, #d8dee6 24px);
         border: 1px dashed #93a1ad;
@@ -57,6 +58,12 @@
       #google_ads_iframe_test {
         height: 250px;
         margin-top: 16px;
+      }
+
+      .iframe-slot {
+        display: block;
+        height: 90px;
+        width: 728px;
       }
 
       .article-promo {
@@ -97,6 +104,7 @@
         <span>Bundled asset check</span>
       </div>
       <div class="leaderboard-ad">Leaderboard advertisement</div>
+      <iframe class="iframe-slot" title="Ad iframe" src="https://googleads.g.doubleclick.net/pagead/ads?client=cuteblock-test"></iframe>
       <div class="layout">
         <article>
           <h1>CuteBlock test page</h1>

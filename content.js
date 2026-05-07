@@ -11498,8 +11498,12 @@
           "native-ad",
           "paid-content",
           "sponsored-card",
+          "sponsored-content",
           "sponsored-post",
-          "promoted-post"
+          "promoted-post",
+          "taboola",
+          "outbrain",
+          "mgid"
         ]);
         const STRONG_TOKEN_PARTS = [...STRONG_TOKENS];
         const WEAK_TOKENS = /* @__PURE__ */ new Set(["sponsor", "sponsored", "promoted", "ad", "ads"]);
@@ -11551,6 +11555,12 @@
           const pool = settings.theme === "mixed" ? ANIMALS : ANIMALS.filter((animal) => animal.theme === settings.theme);
           const choices = pool.length ? pool : ANIMALS;
           return choices[Math.floor(Math.random() * choices.length)];
+        }
+        function pickCardAnimal() {
+          if (settings.imageSource === "online-dogs") {
+            return ANIMALS.find((animal) => animal.theme === "dogs") || ANIMALS[0];
+          }
+          return pickAnimal();
         }
         function isSupportedRemoteImage(url) {
           return /\.(avif|jpe?g|png|webp)(\?.*)?$/i.test(url);
@@ -11804,9 +11814,10 @@
         }
         function shouldReplace(element, source = "heuristic") {
           if (!isVisibleCandidate(element) || hasCosmeticException(element)) return false;
-          if (source === "cosmetic") return true;
           const rect = element.getBoundingClientRect();
-          return scoreHeuristic(element, rect) >= getDensityThreshold();
+          const score = scoreHeuristic(element, rect);
+          if (source === "cosmetic") return score >= Math.max(3, getDensityThreshold() - 1);
+          return score >= getDensityThreshold();
         }
         function isSafeReplacementTarget(element, childRect) {
           if (!(element instanceof HTMLElement)) return false;
@@ -11836,7 +11847,7 @@
           return target;
         }
         function createCard(width, height) {
-          const animal = pickAnimal();
+          const animal = pickCardAnimal();
           const compact = width < 180 || height < 95;
           const fitMode = getImageFitMode(width, height);
           const card = document.createElement("div");
@@ -11882,7 +11893,13 @@
             return;
           }
           const rect = target.getBoundingClientRect();
+          const card = createCard(rect.width, rect.height);
+          if (target instanceof HTMLIFrameElement) {
+            replaceFrame(target, card, rect);
+            return;
+          }
           const original = {
+            mode: "children",
             children: [...target.childNodes],
             style: {
               minWidth: target.style.getPropertyValue("min-width"),
@@ -11893,7 +11910,6 @@
               overflowPriority: target.style.getPropertyPriority("overflow")
             }
           };
-          const card = createCard(rect.width, rect.height);
           replaced.set(target, original);
           target.setAttribute(REPLACED_ATTR, "true");
           target.replaceChildren(card);
@@ -11901,8 +11917,35 @@
           target.style.setProperty("min-height", `${Math.round(rect.height)}px`, "important");
           target.style.setProperty("overflow", "hidden", "important");
         }
+        function replaceFrame(target, card, rect) {
+          if (!target.parentElement) return;
+          const original = {
+            mode: "hidden-frame",
+            card,
+            style: {
+              display: target.style.getPropertyValue("display"),
+              displayPriority: target.style.getPropertyPriority("display"),
+              minWidth: target.style.getPropertyValue("min-width"),
+              minWidthPriority: target.style.getPropertyPriority("min-width"),
+              minHeight: target.style.getPropertyValue("min-height"),
+              minHeightPriority: target.style.getPropertyPriority("min-height"),
+              overflow: target.style.getPropertyValue("overflow"),
+              overflowPriority: target.style.getPropertyPriority("overflow")
+            }
+          };
+          card.style.setProperty("width", `${Math.max(Math.round(rect.width), 72)}px`, "important");
+          card.style.setProperty("max-width", "100%", "important");
+          target.before(card);
+          replaced.set(target, original);
+          target.setAttribute(REPLACED_ATTR, "true");
+          target.style.setProperty("display", "none", "important");
+        }
         function restoreElement(element, original) {
-          element.replaceChildren(...original.children);
+          if (original.mode === "children") element.replaceChildren(...original.children);
+          if (original.mode === "hidden-frame") {
+            original.card?.remove();
+            restoreStyle(element, "display", original.style.display, original.style.displayPriority);
+          }
           element.removeAttribute(REPLACED_ATTR);
           restoreStyle(element, "min-width", original.style.minWidth, original.style.minWidthPriority);
           restoreStyle(element, "min-height", original.style.minHeight, original.style.minHeightPriority);

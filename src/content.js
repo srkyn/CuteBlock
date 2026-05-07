@@ -36,7 +36,8 @@ import { FiltersEngine } from "@ghostery/adblocker";
   const STRONG_TOKENS = new Set([
     "ad-container", "ad-wrapper", "ad-unit", "ad-slot", "ad-banner", "banner-ad",
     "advertisement", "advertising", "adsbygoogle", "dfp-ad", "google-ads", "leaderboard-ad",
-    "native-ad", "paid-content", "sponsored-card", "sponsored-post", "promoted-post"
+    "native-ad", "paid-content", "sponsored-card", "sponsored-content", "sponsored-post",
+    "promoted-post", "taboola", "outbrain", "mgid"
   ]);
 
   const STRONG_TOKEN_PARTS = [...STRONG_TOKENS];
@@ -92,6 +93,14 @@ import { FiltersEngine } from "@ghostery/adblocker";
       : ANIMALS.filter((animal) => animal.theme === settings.theme);
     const choices = pool.length ? pool : ANIMALS;
     return choices[Math.floor(Math.random() * choices.length)];
+  }
+
+  function pickCardAnimal() {
+    if (settings.imageSource === "online-dogs") {
+      return ANIMALS.find((animal) => animal.theme === "dogs") || ANIMALS[0];
+    }
+
+    return pickAnimal();
   }
 
   function isSupportedRemoteImage(url) {
@@ -414,10 +423,10 @@ import { FiltersEngine } from "@ghostery/adblocker";
 
   function shouldReplace(element, source = "heuristic") {
     if (!isVisibleCandidate(element) || hasCosmeticException(element)) return false;
-    if (source === "cosmetic") return true;
-
     const rect = element.getBoundingClientRect();
-    return scoreHeuristic(element, rect) >= getDensityThreshold();
+    const score = scoreHeuristic(element, rect);
+    if (source === "cosmetic") return score >= Math.max(3, getDensityThreshold() - 1);
+    return score >= getDensityThreshold();
   }
 
   function isSafeReplacementTarget(element, childRect) {
@@ -451,7 +460,7 @@ import { FiltersEngine } from "@ghostery/adblocker";
   }
 
   function createCard(width, height) {
-    const animal = pickAnimal();
+    const animal = pickCardAnimal();
     const compact = width < 180 || height < 95;
     const fitMode = getImageFitMode(width, height);
     const card = document.createElement("div");
@@ -506,7 +515,14 @@ import { FiltersEngine } from "@ghostery/adblocker";
     }
 
     const rect = target.getBoundingClientRect();
+    const card = createCard(rect.width, rect.height);
+    if (target instanceof HTMLIFrameElement) {
+      replaceFrame(target, card, rect);
+      return;
+    }
+
     const original = {
+      mode: "children",
       children: [...target.childNodes],
       style: {
         minWidth: target.style.getPropertyValue("min-width"),
@@ -518,7 +534,6 @@ import { FiltersEngine } from "@ghostery/adblocker";
       }
     };
 
-    const card = createCard(rect.width, rect.height);
     replaced.set(target, original);
     target.setAttribute(REPLACED_ATTR, "true");
     target.replaceChildren(card);
@@ -527,8 +542,38 @@ import { FiltersEngine } from "@ghostery/adblocker";
     target.style.setProperty("overflow", "hidden", "important");
   }
 
+  function replaceFrame(target, card, rect) {
+    if (!target.parentElement) return;
+
+    const original = {
+      mode: "hidden-frame",
+      card,
+      style: {
+        display: target.style.getPropertyValue("display"),
+        displayPriority: target.style.getPropertyPriority("display"),
+        minWidth: target.style.getPropertyValue("min-width"),
+        minWidthPriority: target.style.getPropertyPriority("min-width"),
+        minHeight: target.style.getPropertyValue("min-height"),
+        minHeightPriority: target.style.getPropertyPriority("min-height"),
+        overflow: target.style.getPropertyValue("overflow"),
+        overflowPriority: target.style.getPropertyPriority("overflow")
+      }
+    };
+
+    card.style.setProperty("width", `${Math.max(Math.round(rect.width), 72)}px`, "important");
+    card.style.setProperty("max-width", "100%", "important");
+    target.before(card);
+    replaced.set(target, original);
+    target.setAttribute(REPLACED_ATTR, "true");
+    target.style.setProperty("display", "none", "important");
+  }
+
   function restoreElement(element, original) {
-    element.replaceChildren(...original.children);
+    if (original.mode === "children") element.replaceChildren(...original.children);
+    if (original.mode === "hidden-frame") {
+      original.card?.remove();
+      restoreStyle(element, "display", original.style.display, original.style.displayPriority);
+    }
     element.removeAttribute(REPLACED_ATTR);
     restoreStyle(element, "min-width", original.style.minWidth, original.style.minWidthPriority);
     restoreStyle(element, "min-height", original.style.minHeight, original.style.minHeightPriority);

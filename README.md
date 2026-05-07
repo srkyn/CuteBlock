@@ -7,7 +7,7 @@ CuteBlock is a playful browser extension that replaces obvious ad containers wit
 1. Open `chrome://extensions` or `edge://extensions`.
 2. Enable developer mode.
 3. Choose **Load unpacked**.
-4. Select this folder: `C:\Users\Admin\Documents\CSProjects\CuteBlock`.
+4. Select the cloned `CuteBlock` folder.
 
 ## Try It
 
@@ -51,10 +51,16 @@ Build the bundled content script:
 npm run build
 ```
 
-Run the local checks:
+Run the full local checks:
 
 ```bash
 npm run check
+```
+
+Run browser regression tests:
+
+```bash
+npm run test:browser
 ```
 
 ## Privacy And Notices
