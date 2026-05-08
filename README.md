@@ -10,7 +10,7 @@ Instead of leaving awkward blank spaces where ads used to be, CuteBlock keeps th
 
 CuteBlock is a small browser-control project with a privacy-first default: replace the page elements locally, preserve layout, and avoid external image requests unless the user explicitly enables an optional online source.
 
-The project is intentionally lighthearted, but the engineering focus is serious: Manifest V3 permissions, content-script behavior, cosmetic filter parsing, reversible DOM changes, and clear user control from the popup.
+The project is lighthearted, but the engineering focus is serious: Manifest V3 permissions, content-script behavior, cosmetic filter parsing, reversible DOM changes, and clear user control from the popup.
 
 ## Load It In Chrome Or Edge
 
